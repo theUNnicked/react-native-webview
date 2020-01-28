@@ -9,6 +9,11 @@ import styles from './WebView.styles';
 
 const defaultOriginWhitelist = ['http://*', 'https://*'];
 
+const extractOrigin = (url: string): string => {
+  const result = /^[A-Za-z][A-Za-z0-9+\-.]+:(\/\/)?[^/]*/.exec(url);
+  return result === null ? '' : result.join('/');
+};
+
 const originWhitelistToRegex = (originWhitelist: string): string =>
   `^${escapeStringRegexp(originWhitelist).replace(/\\\*/g, '.*')}`;
 
@@ -16,7 +21,8 @@ const passesWhitelist = (
   compiledWhitelist: readonly string[],
   url: string,
 ) => {
-  return compiledWhitelist.some(x => new RegExp(x).test(url));
+  const origin = extractOrigin(url);
+  return compiledWhitelist.some(x => new RegExp(x).test(origin));
 };
 
 const compileWhitelist = (
